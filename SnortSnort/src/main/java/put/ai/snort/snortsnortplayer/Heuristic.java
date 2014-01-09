@@ -1,4 +1,4 @@
-package put.ai.snort.nastyplayer;
+package put.ai.snort.snortsnortplayer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,7 +12,7 @@ import put.ai.snort.game.Move;
 import put.ai.snort.game.Player;
 
 public class Heuristic{
-	public Int Assess(List<Move> list) {
+	public int Assess(List<Move> list) {
 
 		return 1;
 	}

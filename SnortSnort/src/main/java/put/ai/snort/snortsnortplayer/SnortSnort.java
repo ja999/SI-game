@@ -25,19 +25,54 @@ public class SnortSnort extends Player {
         List<Move> moves = b.getMovesFor(getColor());
         int max = - b.getSize();
         Move best = null;
+        int alfa = - b.getSize();
+        int beta = b.getSize();
         for(Move move : moves) {
         	b.doMove(move);
-        	int heur = heuristic(b, getColor());
-        	if (max<heur) {
-        		max = heur;
+        	alfa = alphabeta(b,depth - 1, alfa, beta, getColor());
+        	if (max<alfa) {
+        		max = alfa;
         		best = move;
         	}
-        	
+
         	b.undoMove(move);
         }
         return best;
     }
-    
+
+    public int alphabeta(Board b, int depth, int alfa, int beta, Color color){
+        if (depth == 0) {
+            return heuristic(b, color);
+        }
+        else if (b.getMovesFor(color).size()) {
+            return -64;
+        }
+        if (color == getColor()) {
+            for (Move move: b.getMovesFor(color)) {
+                b.doMove(move);
+                Move last_move = move;
+                alfa = Math.max(alfa, alphabeta(b, depth - 1, alfa, beta, getOpponent(color)));
+                if (beta <= alfa){
+                    break;
+                }
+                b.undoMove(move);
+            }
+            return alfa;
+        }
+        else {
+            for (Move move: b.getMovesFor(color)) {
+                b.doMove(move);
+                Move last_move = move;
+                beta = Math.min(beta, -alphabeta(b, depth - 1, alfa, beta, getOpponent(color)));
+                if (beta <= alfa){
+                    break;
+                }
+                b.undoMove(move);
+            }
+            return beta;
+        }
+    }
+
     public int heuristic (Board b, Color color) {
         List<Move> myMoves = b.getMovesFor(color);
         List<Move> opMoves = b.getMovesFor(getOpponent(color));
