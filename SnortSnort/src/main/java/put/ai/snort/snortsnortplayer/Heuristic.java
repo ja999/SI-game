@@ -12,7 +12,8 @@ import put.ai.snort.game.Move;
 import put.ai.snort.game.Player;
 
 public class Heuristic{
-	public Int Assess() {
+	public Int Assess(List<Move> list) {
+
 		return 1;
 	}
 }
