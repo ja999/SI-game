@@ -23,6 +23,27 @@ public class SnortSnort extends Player {
     @Override
     public Move nextMove(Board b) {
         List<Move> moves = b.getMovesFor(getColor());
-        return moves.get(random.nextInt(moves.size()));
+        int max = - b.getSize();
+        Move best = null;
+        for(Move move : moves) {
+        	b.doMove(move);
+        	int heur = heuristic(b, getColor());
+        	if (max<heur) {
+        		max = heur;
+        		best = move;
+        	}
+        	
+        	b.undoMove(move);
+        }
+        return best;
+    }
+    
+    public int heuristic (Board b, Color color) {
+        List<Move> myMoves = b.getMovesFor(color);
+        List<Move> opMoves = b.getMovesFor(getOpponent(color));
+        if (color == getColor())
+        	return myMoves.size() - opMoves.size();
+        else
+        	return opMoves.size() - myMoves.size();
     }
 }
