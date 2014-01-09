@@ -23,6 +23,7 @@
         <module>SnortEngine</module>
         <module>BoardGame</module>
         <module>NaivePlayer</module>
+        <module>SnortSnort</module>
         <module>NastyPlayer</module>
         <module>SnortCLI</module>
         <module>SnortGUI</module>
