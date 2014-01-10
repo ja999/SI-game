@@ -22,7 +22,7 @@ public class SnortSnort extends Player {
     @Override
     public Move nextMove(Board b) {
         List<Move> moves = b.getMovesFor(getColor());
-        int max = - b.getSize();
+        int max = - boardSize;
         Move best = null;
         for(Move move : moves) {
                 b.doMove(move);
@@ -36,8 +36,10 @@ public class SnortSnort extends Player {
         }
         return best;
     }*/
+    int boardSize;
     @Override
     public Move nextMove(Board b) {
+    	boardSize = b.getSize()*b.getSize();
     	int depth = 4;
         List<Move> moves = b.getMovesFor(getColor());
         if (moves.size()<30) 
@@ -46,13 +48,14 @@ public class SnortSnort extends Player {
         	depth = 6;
         if (moves.size()<10) 
         	depth = 7;
-        int max = - b.getSize()-1;
+        depth = 4;
+        int max = - boardSize-1;
         Move best = null;
-        int alfa = - b.getSize();
-        int beta = b.getSize();
+        int alfa = - boardSize;
+        int beta = boardSize;
         for(Move move : moves) {
         	b.doMove(move);
-        	alfa = alphabeta(b,depth - 1, alfa, beta, getColor());
+        	alfa = alphabeta(b,depth - 1, alfa, beta, getOpponent(getColor()));
         	if (max<alfa) {
         		max = alfa;
         		best = move;
@@ -65,13 +68,16 @@ public class SnortSnort extends Player {
 
     public int alphabeta(Board b, int depth, int alfa, int beta, Color color){
     	//if(true) return 0;
-        if (depth == 0) {
-            return heuristic(b, color);
+        if (b.getMovesFor(color).size() == 0) {
+        	if (color == getColor())
+        		return -boardSize;
+        	else
+        		return boardSize;
         }
-        else if (b.getMovesFor(color).size() == 0) {
-            return -b.getSize();
+        else if (depth == 0) {
+            return heuristic(b, getOpponent(color));
         }
-        if (color == getColor()) {
+        else if (color == getColor()) {
             for (Move move: b.getMovesFor(color)) {
                 b.doMove(move);
                 Move last_move = move;
