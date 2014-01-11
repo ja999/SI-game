@@ -41,31 +41,26 @@ public class SnortSnort extends Player {
     int boardSize;
     @Override
     public Move nextMove(Board b) {
-    	boardSize = b.getSize()*b.getSize();
     	int depth = 4;
         List<Move> moves = b.getMovesFor(getColor());
-        if (moves.size()<30) 
-        	depth = 5;
-        if (moves.size()<20) 
-        	depth = 6;
-        if (moves.size()<10) 
-        	depth = 7;
-        depth = 4;
+    	boardSize = b.getSize()*b.getSize();
         int max = - boardSize-1;
         Move best = null;
+        
         int alfa = - boardSize;
         int beta = boardSize;
     	PriorityQueue<HeuristicMove> movesQueue = new PriorityQueue<HeuristicMove>(moves.size(), new HeuristicMoveComparator());
-        for (Move move: moves) {
+        for (Move move : moves) {
         	b.doMove(move);
-        	movesQueue.add(new HeuristicMove(-heuristic(b,getOpponent(getColor())), move));
+        	movesQueue.add(new HeuristicMove(-heuristic(b,getColor()), move));
         	b.undoMove(move);
         }
         Move move;
+        Color opColor = getOpponent(getColor());
         while(!movesQueue.isEmpty()) {
         	move = movesQueue.poll().move;
         	b.doMove(move);
-        	alfa = alphabeta(b,depth - 1, alfa, beta, getOpponent(getColor()));
+        	alfa = opAlphabeta(b,depth - 1, alfa, beta, opColor);
         	if (max<alfa) {
         		max = alfa;
         		best = move;
@@ -128,14 +123,14 @@ public class SnortSnort extends Player {
         	PriorityQueue<HeuristicMove> movesQueue = new PriorityQueue<HeuristicMove>(moves.size(), new HeuristicMoveComparator());
             for (Move move: moves) {
             	b.doMove(move);
-            	movesQueue.add(new HeuristicMove(-heuristic(b,getOpponent(color)), move));
+            	movesQueue.add(new HeuristicMove(heuristic(b,color), move));
             	b.undoMove(move);
             }
             Move move;
             while(!movesQueue.isEmpty()) {
             	move = movesQueue.poll().move;
             	b.doMove(move);
-                alfa = Math.max(alfa, alphabeta(b, depth - 1, alfa, beta, getOpponent(color)));
+                alfa = Math.max(alfa, opAlphabeta(b, depth - 1, alfa, beta, getOpponent(color)));
                 b.undoMove(move);
                 if (beta <= alfa){
                 	movesQueue.clear();
@@ -149,14 +144,14 @@ public class SnortSnort extends Player {
         	PriorityQueue<HeuristicMove> movesQueue = new PriorityQueue<HeuristicMove>(moves.size(), new HeuristicMoveComparator());
             for (Move move: moves) {
             	b.doMove(move);
-            	movesQueue.add(new HeuristicMove(-heuristic(b,getOpponent(color)), move));
+            	movesQueue.add(new HeuristicMove(heuristic(b,getOpponent(color)), move));
             	b.undoMove(move);
             }
             Move move;
             while(!movesQueue.isEmpty()) {
             	move = movesQueue.poll().move;
                 b.doMove(move);
-                beta = Math.min(beta, alphabeta(b, depth - 1, alfa, beta, getOpponent(color)));
+                beta = Math.min(beta, opAlphabeta(b, depth - 1, alfa, beta, getOpponent(color)));
                 b.undoMove(move);
                 if (beta <= alfa){
                     break;
