@@ -5,7 +5,9 @@
 package put.ai.snort.snortsnortplayer;
 
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Random;
+
 import put.ai.snort.game.Board;
 import put.ai.snort.game.Move;
 import put.ai.snort.game.Player;
@@ -53,7 +55,15 @@ public class SnortSnort extends Player {
         Move best = null;
         int alfa = - boardSize;
         int beta = boardSize;
-        for(Move move : moves) {
+    	PriorityQueue<HeuristicMove> movesQueue = new PriorityQueue<HeuristicMove>(moves.size(), new HeuristicMoveComparator());
+        for (Move move: moves) {
+        	b.doMove(move);
+        	movesQueue.add(new HeuristicMove(-heuristic(b,getOpponent(getColor())), move));
+        	b.undoMove(move);
+        }
+        Move move;
+        while(!movesQueue.isEmpty()) {
+        	move = movesQueue.poll().move;
         	b.doMove(move);
         	alfa = alphabeta(b,depth - 1, alfa, beta, getOpponent(getColor()));
         	if (max<alfa) {
@@ -93,6 +103,59 @@ public class SnortSnort extends Player {
             for (Move move: b.getMovesFor(color)) {
                 b.doMove(move);
                 Move last_move = move;
+                beta = Math.min(beta, alphabeta(b, depth - 1, alfa, beta, getOpponent(color)));
+                b.undoMove(move);
+                if (beta <= alfa){
+                    break;
+                }
+            }
+            return beta;
+        }
+    }
+
+    public int opAlphabeta(Board b, int depth, int alfa, int beta, Color color){
+        if (b.getMovesFor(color).size() == 0) {
+        	if (color == getColor())
+        		return -boardSize;
+        	else
+        		return boardSize;
+        }
+        else if (depth == 0) {
+            return heuristic(b, getOpponent(color));
+        }
+        else if (color == getColor()) {
+        	List<Move> moves = b.getMovesFor(color);
+        	PriorityQueue<HeuristicMove> movesQueue = new PriorityQueue<HeuristicMove>(moves.size(), new HeuristicMoveComparator());
+            for (Move move: moves) {
+            	b.doMove(move);
+            	movesQueue.add(new HeuristicMove(-heuristic(b,getOpponent(color)), move));
+            	b.undoMove(move);
+            }
+            Move move;
+            while(!movesQueue.isEmpty()) {
+            	move = movesQueue.poll().move;
+            	b.doMove(move);
+                alfa = Math.max(alfa, alphabeta(b, depth - 1, alfa, beta, getOpponent(color)));
+                b.undoMove(move);
+                if (beta <= alfa){
+                	movesQueue.clear();
+                    break;
+                }
+            }
+            return alfa;
+        }
+        else {
+        	List<Move> moves = b.getMovesFor(color);
+        	PriorityQueue<HeuristicMove> movesQueue = new PriorityQueue<HeuristicMove>(moves.size(), new HeuristicMoveComparator());
+            for (Move move: moves) {
+            	b.doMove(move);
+            	movesQueue.add(new HeuristicMove(-heuristic(b,getOpponent(color)), move));
+            	b.undoMove(move);
+            }
+            Move move;
+            while(!movesQueue.isEmpty()) {
+            	move = movesQueue.poll().move;
+                b.doMove(move);
                 beta = Math.min(beta, alphabeta(b, depth - 1, alfa, beta, getOpponent(color)));
                 b.undoMove(move);
                 if (beta <= alfa){
