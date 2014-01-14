@@ -23,5 +23,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="/BoardGame"/>
+	<classpathentry kind="src" path="/engine"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
